@@ -38,11 +38,9 @@ class TurtlePIDController:
 
 
     def turtle_square(self):
-        self.pos_x, self.pos_y = self.get_current_position()
-
         if not self.square_defined:
-            self.square_x=[self.pos_x, self.pos_x+1, self.pos_x+1, self.pos_x]
-            self.square_y=[self.pos_y+1, self.pos_y+1, self.pos_y, self.pos_y]
+            self.square_x=[self.pos_x, self.pos_x+2, self.pos_x+2, self.pos_x]
+            self.square_y=[self.pos_y+2, self.pos_y+2, self.pos_y, self.pos_y]
             self.square_defined = True
 
         idx = self.i % len(self.square_x)
@@ -53,8 +51,18 @@ class TurtlePIDController:
             self.i += 1
 
     def turtle_triangle(self):
-        self.pos_x, self.pos_y = self.get_current_position()
-       
+        if not self.triangle_defined:
+            self.tri_x = [self.pos_x, self.pos_x + 2, self.pos_x + 1]
+            self.tri_y = [self.pos_y, self.pos_y, self.pos_y + math.sqrt(5)/2]
+            self.triangle_defined = True
+
+        idx = self.i % len(self.tri_x)
+        self.destino_x = self.tri_x[idx]
+        self.destino_y = self.tri_y[idx]
+
+        if abs(self.pos_x - self.destino_x) < 0.1 and abs(self.pos_y - self.destino_y) < 0.1:
+            self.i += 1
+
 
     def pose_callback(self, msg):
         current_x = msg.x
@@ -85,7 +93,7 @@ class TurtlePIDController:
         print(theta_erro)
         print()
 
-        if abs(theta_erro) > 0.1:
+        if abs(theta_erro) > 0.05:
             py = kpy * theta_erro
             
             integral_y = (kiy*self.error_acumulated)*hz
